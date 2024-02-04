@@ -32,10 +32,12 @@ exports.up = async function (DB) {
     await DB`
         CREATE TABLE rating(
             id INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
-            rating INT DEFAULT 1500 NOT NULL,
             user_id INT NOT NULL,
             variant VARCHAR(3) NOT NULL,
             time_control TEXT NOT NULL,
+            rating DECIMAL DEFAULT 1500 NOT NULL,         -- 1500 is initial value in glicko2 
+            ratingDeviation DECIMAL DEFAULT 350 NOT NULL, -- 350 is initial value in glicko2 
+            volatility DECIMAL DEFAULT 0.6 NOT NULL,      -- 0.1 is initial value in glicko2 
             games_played INT DEFAULT 0  NOT NULL,
             updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL,
             UNIQUE(user_id, variant, time_control),
@@ -47,6 +49,7 @@ exports.up = async function (DB) {
         CREATE TABLE tournament(
             id INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
             name VARCHAR(50) NOT NULL,
+            description TEXT,
             type VARCHAR(10) NOT NULL, -- arena, swiss
             variant VARCHAR(3) NOT NULL,
             time_control TEXT NOT NULL,
@@ -85,7 +88,7 @@ exports.up = async function (DB) {
             black_player_id INT NOT NULL,
             rating_b INT NOT NULL,
             rating_b_after INT NOT NULL,
-            result VARCHAR(2) NOT NULL, -- w: white win, b: black win, d: draw
+            result VARCHAR(2) NOT NULL, -- WC: white checkmates, BC: black checkmates, D: draw, WR: white resigns, BR: black resigns, WT: white times out, BT: black times out, WF: white forfeits, BF: black forfeits, D: draw
             winner_id INT NOT NULL,
             loser_id INT NOT NULL,
             moves TEXT NOT NULL,
@@ -106,6 +109,6 @@ exports.down = async function (DB) {
     await DB`DROP TABLE IF EXISTS tournament_standing;`;
     await DB`DROP TABLE IF EXISTS tournament;`;
     await DB`DROP TABLE IF EXISTS rating;`;
-    await DB`DROP TABLE IF EXISTS follow;`;
+    await DB`DROP TABLE IF EXISTS following;`;
     await DB`DROP TABLE IF EXISTS users;`;
 }
