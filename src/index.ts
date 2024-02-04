@@ -1,7 +1,10 @@
-import { Elysia } from "elysia";
+import { Elysia } from 'elysia'
+import { DB } from './database'
 
-const app = new Elysia().get("/", () => "Hello Elysia").listen(3000);
+const [user] = await DB`
+  select * from users;
+`
 
-console.log(
-  `🦊 Elysia is running at ${app.server?.hostname}:${app.server?.port}`
-);
+const app = new Elysia().get('/', () => (user ? user.id : 'user not found')).listen(4000)
+
+console.log(`🦊 Elysia is running at ${app.server?.hostname}:${app.server?.port}`)
