@@ -36,7 +36,7 @@ exports.up = async function (DB) {
             variant VARCHAR(3) NOT NULL,
             time_control TEXT NOT NULL,
             rating DECIMAL DEFAULT 1500 NOT NULL,         -- 1500 is initial value in glicko2 
-            ratingDeviation DECIMAL DEFAULT 350 NOT NULL, -- 350 is initial value in glicko2 
+            rating_deviation DECIMAL DEFAULT 350 NOT NULL, -- 350 is initial value in glicko2 
             volatility DECIMAL DEFAULT 0.6 NOT NULL,      -- 0.1 is initial value in glicko2 
             games_played INT DEFAULT 0  NOT NULL,
             updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL,
@@ -82,26 +82,26 @@ exports.up = async function (DB) {
             time_control TEXT NOT NULL,     -- bullet, blitz, rapid, classic 
             time VARCHAR(7) NOT NULL,       -- minutes|seconds, example: 30|15
             is_rated BOOLEAN NOT NULL DEFAULT TRUE,
-            white_player_id INT NOT NULL,
-            rating_w INT NOT NULL, 
-            rating_w_after INT NOT NULL,
-            black_player_id INT NOT NULL,
-            rating_b INT NOT NULL,
-            rating_b_after INT NOT NULL,
+            white_id INT NOT NULL,
+            white_rating INT NOT NULL, 
+            white_rating_after INT NOT NULL,
+            black_id INT NOT NULL,
+            black_rating INT NOT NULL,
+            black_rating_after INT NOT NULL,
             result VARCHAR(2) NOT NULL, -- WC: white checkmates, BC: black checkmates, D: draw, WR: white resigns, BR: black resigns, WT: white times out, BT: black times out, WF: white forfeits, BF: black forfeits, D: draw
             winner_id INT NOT NULL,
             loser_id INT NOT NULL,
             moves TEXT NOT NULL,
             tournament_id INT, 
             created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL,
-            FOREIGN KEY(white_player_id) REFERENCES users(id),
-            FOREIGN KEY(black_player_id) REFERENCES users(id),
+            FOREIGN KEY(white_id) REFERENCES users(id),
+            FOREIGN KEY(black_id) REFERENCES users(id),
             FOREIGN KEY(winner_id) REFERENCES users(id),
             FOREIGN KEY(loser_id) REFERENCES users(id),
             FOREIGN KEY(tournament_id) REFERENCES tournament(id)
         );
     `;
-    await DB`ALTER TABLE game ADD CONSTRAINT white_cannot_be_equal_to_black CHECK (white_player_id <> black_player_id);`;
+    await DB`ALTER TABLE game ADD CONSTRAINT white_cannot_be_equal_to_black CHECK (white_id <> black_id);`;
   }
   
 exports.down = async function (DB) {
